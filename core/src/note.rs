@@ -72,16 +72,16 @@ impl Note {
         let (name_part, octave_part) = normalized.split_at(split_index);
         let note_name = match name_part {
             "C" => NoteName::C,
-            "C#" => NoteName::CSharp,
+            "C#" | "DB" => NoteName::CSharp,
             "D" => NoteName::D,
-            "D#" => NoteName::DSharp,
+            "D#" | "EB" => NoteName::DSharp,
             "E" => NoteName::E,
             "F" => NoteName::F,
-            "F#" => NoteName::FSharp,
+            "F#" | "GB" => NoteName::FSharp,
             "G" => NoteName::G,
-            "G#" => NoteName::GSharp,
+            "G#" | "AB" => NoteName::GSharp,
             "A" => NoteName::A,
-            "A#" => NoteName::ASharp,
+            "A#" | "BB" => NoteName::ASharp,
             "B" => NoteName::B,
             _ => return None,
         };
@@ -190,6 +190,12 @@ mod tests {
         assert_eq!(Note::from_label("E2").unwrap().midi(), 40);
         assert_eq!(Note::from_label("a#3").unwrap().label(), "A#3");
         assert!(Note::from_label("Hb2").is_none());
+    }
+
+    #[test]
+    fn parses_flat_note_labels_used_by_presets() {
+        assert_eq!(Note::from_label("Eb2").unwrap().label(), "D#2");
+        assert_eq!(Note::from_label("Bb3").unwrap().label(), "A#3");
     }
 
     #[test]
