@@ -20,3 +20,9 @@ jobs:
         run: cargo test -p tuner-dsp --features native-audio
       - name: Verify tuner-dsp web-audio build
         run: cargo check -p tuner-dsp --no-default-features --features web-audio
+      - name: Verify tuner-web-bridge API contract
+        run: cargo test -p tuner-web-bridge --test api_contract
+      - name: Install wasm-pack
+        run: cargo install wasm-pack --locked
+      - name: Verify tuner-web-bridge wasm package build
+        run: wasm-pack build web-bridge --target web
