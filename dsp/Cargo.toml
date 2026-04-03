@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
+# Platform selection:
+# - native-audio (default): enables CPAL-based capture via dsp::audio.
+# - web-audio: excludes native capture and keeps pitch-detection DSP available for web hosts.
+# These features are mutually exclusive and enforced in src/lib.rs.
 default = ["native-audio"]
 native-audio = ["dep:cpal"]
 web-audio = []

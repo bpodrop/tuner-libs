@@ -1,3 +1,8 @@
+#[cfg(all(feature = "native-audio", feature = "web-audio"))]
+compile_error!(
+    "features \"native-audio\" and \"web-audio\" are mutually exclusive; enable only one"
+);
+
 #[cfg(feature = "native-audio")]
 pub mod audio;
 pub mod interpolate;
