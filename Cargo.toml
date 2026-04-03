@@ -1,0 +1,3 @@
+[workspace]
+members = ["core", "dsp"]
+resolver = "2"
