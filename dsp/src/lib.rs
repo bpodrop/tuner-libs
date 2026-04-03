@@ -1,7 +1,8 @@
-#[cfg(all(feature = "native-audio", feature = "web-audio"))]
-compile_error!(
-    "features \"native-audio\" and \"web-audio\" are mutually exclusive; enable only one"
-);
+//! DSP primitives shared by native and web hosts.
+//!
+//! `web-audio` marks web-host compatibility for downstream consumers.
+//! `native-audio` enables CPAL capture and may be enabled alongside `web-audio`
+//! in workspace-wide checks that unify feature sets.
 
 #[cfg(feature = "native-audio")]
 pub mod audio;
