@@ -16,3 +16,7 @@ jobs:
         run: bash scripts/check-workspace.sh
       - name: Cargo check workspace
         run: cargo check --workspace
+      - name: Verify tuner-dsp native-audio
+        run: cargo test -p tuner-dsp --features native-audio
+      - name: Verify tuner-dsp web-audio build
+        run: cargo check -p tuner-dsp --no-default-features --features web-audio

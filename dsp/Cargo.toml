@@ -3,4 +3,11 @@ name = "tuner-dsp"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+default = ["native-audio"]
+native-audio = ["dep:cpal"]
+web-audio = []
+
 [dependencies]
+tuner-core = { path = "../core" }
+cpal = { version = "0.15", optional = true }
