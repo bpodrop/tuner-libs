@@ -10,3 +10,5 @@ crate-type = ["cdylib", "rlib"]
 tuner-core = { path = "../core" }
 tuner-dsp = { path = "../dsp", default-features = false, features = ["web-audio"] }
 wasm-bindgen = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde-wasm-bindgen = "0.6"

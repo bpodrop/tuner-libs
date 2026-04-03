@@ -1,25 +1,70 @@
 use std::collections::{HashMap, VecDeque};
 use std::sync::{Mutex, OnceLock};
 
-use tuner_core::PitchDetectionResult;
+use serde::{Deserialize, Serialize};
+use tuner_core::{Note, PitchDetectionResult, UiState};
 use tuner_dsp::{PitchDetector, PitchDetectorConfig};
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct DetectionOutput {
     pub frequency_hz: f32,
     pub confidence: f32,
     pub clarity: f32,
     pub rms: f32,
+    pub cents_off: f32,
+    pub note_name: String,
+    pub ui_state: String,
 }
 
 impl From<PitchDetectionResult> for DetectionOutput {
     fn from(value: PitchDetectionResult) -> Self {
+        let note_estimate = Note::estimate(value.frequency_hz);
+        let cents_off = note_estimate
+            .as_ref()
+            .map(|note| note.cents_offset)
+            .unwrap_or(0.0);
+        let note_name = note_estimate
+            .as_ref()
+            .map(|note| note.note_name.clone())
+            .unwrap_or_else(|| "--".to_string());
+        let ui_state = resolve_ui_state(value.confidence, value.clarity, cents_off);
+
         Self {
             frequency_hz: value.frequency_hz,
             confidence: value.confidence,
             clarity: value.clarity,
             rms: value.rms,
+            cents_off,
+            note_name,
+            ui_state: ui_state_label(ui_state).to_string(),
         }
+    }
+}
+
+fn resolve_ui_state(confidence: f32, clarity: f32, cents_off: f32) -> UiState {
+    if confidence < 0.60 {
+        return UiState::Searching;
+    }
+    if clarity < 0.70 {
+        return UiState::Unstable;
+    }
+    if cents_off < -3.0 {
+        UiState::TooLow
+    } else if cents_off > 3.0 {
+        UiState::TooHigh
+    } else {
+        UiState::InTune
+    }
+}
+
+fn ui_state_label(ui_state: UiState) -> &'static str {
+    match ui_state {
+        UiState::NoSignal => "no_signal",
+        UiState::Searching => "searching",
+        UiState::Unstable => "unstable",
+        UiState::TooLow => "too_low",
+        UiState::InTune => "in_tune",
+        UiState::TooHigh => "too_high",
     }
 }
 
@@ -163,6 +208,7 @@ pub fn shutdown(detector_id: u32) -> bool {
 
 #[cfg(target_arch = "wasm32")]
 mod wasm {
+    use serde_wasm_bindgen::to_value;
     use wasm_bindgen::prelude::*;
 
     #[wasm_bindgen(js_name = new_detector)]
@@ -176,14 +222,9 @@ mod wasm {
     }
 
     #[wasm_bindgen(js_name = next_output)]
-    pub fn wasm_next_output(detector_id: u32) -> Option<Vec<f32>> {
+    pub fn wasm_next_output(detector_id: u32) -> Option<JsValue> {
         super::next_output(detector_id).map(|output| {
-            vec![
-                output.frequency_hz,
-                output.confidence,
-                output.clarity,
-                output.rms,
-            ]
+            to_value(&output).expect("detection output serialization should not fail")
         })
     }
 
