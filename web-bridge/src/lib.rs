@@ -60,7 +60,15 @@ fn registry() -> &'static Mutex<DetectorRegistry> {
     REGISTRY.get_or_init(|| Mutex::new(DetectorRegistry::default()))
 }
 
+fn is_valid_config(sample_rate: u32, frame_size: usize, hop_size: usize) -> bool {
+    sample_rate > 0 && frame_size > 0 && hop_size > 0 && hop_size <= frame_size
+}
+
 pub fn new_detector(sample_rate: u32, frame_size: usize, hop_size: usize) -> u32 {
+    if !is_valid_config(sample_rate, frame_size, hop_size) {
+        return 0;
+    }
+
     let mut lock = registry()
         .lock()
         .expect("detector registry lock should not be poisoned");
@@ -87,12 +95,24 @@ pub fn new_detector(sample_rate: u32, frame_size: usize, hop_size: usize) -> u32
 }
 
 pub fn push_samples(detector_id: u32, samples: &[f32]) -> usize {
+    if detector_id == 0 || samples.is_empty() {
+        return 0;
+    }
+
     let mut lock = registry()
         .lock()
         .expect("detector registry lock should not be poisoned");
     let Some(handle) = lock.detectors.get_mut(&detector_id) else {
         return 0;
     };
+
+    if !is_valid_config(
+        handle.config.sample_rate,
+        handle.config.frame_size,
+        handle.config.hop_size,
+    ) {
+        return 0;
+    }
 
     handle.pending_samples.extend_from_slice(samples);
 

@@ -42,3 +42,21 @@ fn unknown_detector_operations_are_safe() {
     assert!(!reset(unknown_detector_id));
     assert!(!shutdown(unknown_detector_id));
 }
+
+#[test]
+fn invalid_detector_configs_are_rejected_and_safe() {
+    let invalid_frame_id = new_detector(44_100, 0, 1024);
+    let invalid_hop_id = new_detector(44_100, 2048, 0);
+    let invalid_rate_id = new_detector(0, 2048, 256);
+    let invalid_shape_id = new_detector(44_100, 512, 1024);
+
+    assert_eq!(invalid_frame_id, 0);
+    assert_eq!(invalid_hop_id, 0);
+    assert_eq!(invalid_rate_id, 0);
+    assert_eq!(invalid_shape_id, 0);
+
+    assert_eq!(push_samples(invalid_frame_id, &[0.1, -0.1]), 0);
+    assert!(next_output(invalid_frame_id).is_none());
+    assert!(!reset(invalid_frame_id));
+    assert!(!shutdown(invalid_frame_id));
+}
