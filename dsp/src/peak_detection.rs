@@ -79,7 +79,7 @@ fn is_likely_harmonic_peak(candidate: PeakCandidate, peaks: &[PeakCandidate]) ->
 
 #[cfg(test)]
 mod tests {
-    use super::{select_best_peak, PeakCandidate};
+    use super::{PeakCandidate, select_best_peak};
 
     #[test]
     fn prefers_earliest_peak_close_to_strongest_peak() {

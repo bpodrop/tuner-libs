@@ -14,6 +14,8 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - name: Check workspace structure
         run: bash scripts/check-workspace.sh
+      - name: Check legacy naming guard
+        run: bash scripts/check-no-legacy-names.sh
       - name: Cargo check workspace
         run: cargo check --workspace
       - name: Verify tuner-dsp native-audio

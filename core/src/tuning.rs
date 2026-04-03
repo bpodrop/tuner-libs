@@ -301,7 +301,7 @@ pub fn match_frequency_to_preset(
 
 #[cfg(test)]
 mod tests {
-    use super::{all_presets, default_preset, match_frequency_to_preset, preset_by_id, PresetId};
+    use super::{PresetId, all_presets, default_preset, match_frequency_to_preset, preset_by_id};
 
     #[test]
     fn parses_known_preset_ids() {
