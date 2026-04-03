@@ -20,8 +20,8 @@ else:
 PY
 )
 
-if [ "$actual_members" != "core,dsp" ]; then
-  echo "ERROR: workspace members must be exactly core and dsp" >&2
+if [ "$actual_members" != "core,dsp,web-bridge" ]; then
+  echo "ERROR: workspace members must be exactly core, dsp, and web-bridge" >&2
   exit 1
 fi
 
