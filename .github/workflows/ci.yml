@@ -12,5 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+      - name: Check workspace structure
+        run: bash scripts/check-workspace.sh
       - name: Cargo check workspace
         run: cargo check --workspace
